@@ -1,6 +1,6 @@
 module EndpointExample.Server where
 
-import Prelude (Unit, (==), bind, return, ($))
+import Prelude (Unit, (==), bind, pure, ($))
 
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE, log)
@@ -19,8 +19,9 @@ myOrders = [Order {productId: 1, quantity: 50}, Order {productId: 2, quantity: 6
 
 main :: forall eff. Eff ( console :: CONSOLE, express :: EXPRESS, ajax :: AJAX | eff ) Unit
 main = do
-  app <- makeApp
-  hostEndpoint app getOrdersEndpoint (\productId _ -> return $ filterOrders productId)
+  -- clearly, as written, app has type `Array Middleware -> Eff ... App`
+  app <- makeApp []
+  hostEndpoint app getOrdersEndpoint (\productId _ -> pure $ filterOrders productId)
   hostStatic app "static"
   listen app 8080
   log "Listening on port 8080"
